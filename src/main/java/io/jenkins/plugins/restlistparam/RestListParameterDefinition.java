@@ -285,7 +285,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
   public int hashCode() {
     return Objects.hash(
       getName(), getDescription(), getRestEndpoint(), getCredentialId(),
-      getMimeType(), getValueExpression(), getFilter());
+      getMimeType(), getValueExpression(), getFilter(), allowEmptyValue);
   }
 
   @Override
@@ -316,6 +316,9 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
       return false;
     }
     if (!Objects.equals(getFilter(), other.getFilter())) {
+      return false;
+    }
+    if (allowEmptyValue != other.allowEmptyValue) {
       return false;
     }
     return Objects.equals(defaultValue, other.defaultValue);
