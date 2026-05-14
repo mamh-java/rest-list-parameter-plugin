@@ -19,7 +19,10 @@
       <input type="hidden" name="name" value="${it.name}"/>
       <input type="hidden" name="description" value="${it.description}"/>
 
-      <select id="${id}-select" data-select2-id="${id}-select" class="setting-input" name="value">
+      <select id="${id}-select" data-select2-id="${id}-select" data-allow-empty-value="${it.allowEmptyValue}" class="setting-input" name="value">
+        <j:if test="${it.allowEmptyValue}">
+          <f:option value="" selected="${empty it.defaultValue}">&#8212;</f:option>
+        </j:if>
         <j:forEach var="item" items="${it.values}" varStatus="loop">
           <f:option value="${item.value}" selected="${item.displayValue.equals(it.defaultValue)}">
             ${item.displayValue}
