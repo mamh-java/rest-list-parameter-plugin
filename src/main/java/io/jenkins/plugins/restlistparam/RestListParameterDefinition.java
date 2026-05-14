@@ -42,6 +42,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
   private String defaultValue;
   private String filter;
   private Integer cacheTime;
+  private boolean allowEmptyValue;
   private String errorMsg;
   private List<ValueItem> values;
 
@@ -55,7 +56,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
                                      final String displayExpression)
   {
     this(name, description, restEndpoint, credentialId, mimeType, valueExpression,
-      displayExpression, ValueOrder.NONE, ".*", config.getCacheTime(), "");
+      displayExpression, ValueOrder.NONE, ".*", config.getCacheTime(), "", false);
   }
 
   public RestListParameterDefinition(final String name,
@@ -68,7 +69,8 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
                                      final ValueOrder valueOrder,
                                      final String filter,
                                      final Integer cacheTime,
-                                     final String defaultValue)
+                                     final String defaultValue,
+                                     final boolean allowEmptyValue)
   {
     super(name);
     setDescription(description);
@@ -83,6 +85,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
     this.valueOrder = valueOrder != null ? valueOrder : ValueOrder.NONE;
     this.filter = !filter.isBlank() ? filter : ".*";
     this.cacheTime = cacheTime != null ? cacheTime : config.getCacheTime();
+    this.allowEmptyValue = allowEmptyValue;
     this.errorMsg = "";
     this.values = Collections.emptyList();
   }
@@ -98,6 +101,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
                                       final String filter,
                                       final Integer cacheTime,
                                       final String defaultValue,
+                                      final boolean allowEmptyValue,
                                       final List<ValueItem> values)
   {
     super(name);
@@ -113,6 +117,7 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
     this.valueOrder = valueOrder != null ? valueOrder : ValueOrder.NONE;
     this.filter = !filter.isBlank() ? filter : ".*";
     this.cacheTime = cacheTime != null ? cacheTime : config.getCacheTime();
+    this.allowEmptyValue = allowEmptyValue;
     this.errorMsg = "";
     this.values = values;
   }
@@ -181,6 +186,15 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
     this.defaultValue = defaultValue;
   }
 
+  public boolean isAllowEmptyValue() {
+    return allowEmptyValue;
+  }
+
+  @DataBoundSetter
+  public void setAllowEmptyValue(final boolean allowEmptyValue) {
+    this.allowEmptyValue = allowEmptyValue;
+  }
+
   void setErrorMsg(final String errorMsg) {
     this.errorMsg = errorMsg;
   }
@@ -220,7 +234,8 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
       return new RestListParameterDefinition(
         getName(), getDescription(), getRestEndpoint(), getCredentialId(), getMimeType(),
         getValueExpression(), getDisplayExpression(), getValueOrder(), getFilter(), getCacheTime(),
-        ValueResolver.parseDisplayValue(getMimeType(), value.getValue(), displayExpression), getValues());
+        ValueResolver.parseDisplayValue(getMimeType(), value.getValue(), displayExpression),
+        isAllowEmptyValue(), getValues());
     }
     else {
       return this;
@@ -255,6 +270,9 @@ public final class RestListParameterDefinition extends SimpleParameterDefinition
   public boolean isValid(ParameterValue value) {
     if(value == null || value.getValue() == null) {
       return false;
+    }
+    if (allowEmptyValue && "".equals(value.getValue())) {
+      return true;
     }
     getValues();
     return values.stream()

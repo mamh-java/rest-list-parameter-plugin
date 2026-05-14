@@ -44,6 +44,10 @@
       <f:entry title="${%parameter.defaultValue}" field="defaultValue">
         <f:textbox default="" />
       </f:entry>
+
+      <f:entry title="${%parameter.allowEmptyValue}" field="allowEmptyValue">
+        <f:checkbox />
+      </f:entry>
     </f:section>
   </f:advanced>
 

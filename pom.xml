@@ -152,6 +152,30 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>default-testCompile</id>
+            <configuration>
+              <!--
+                Disable annotation processing during testCompile. Without this, sezpoz runs against
+                test sources, finds no @Extension classes, and overwrites the index produced by the
+                main compile (target/classes/META-INF/annotations/hudson.Extension) with an empty
+                file. The packaged hpi then has no extension index and Jenkins reports
+                "Invalid parameter type RESTList" because the @Symbol descriptor never registers.
+              -->
+              <compilerArgument>-proc:none</compilerArgument>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <repositories>
     <repository>
       <id>repo.jenkins-ci.org</id>
